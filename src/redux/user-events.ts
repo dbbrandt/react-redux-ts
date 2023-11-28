@@ -1,4 +1,4 @@
-import { AnyAction } from 'redux';
+import { createReducer } from '@reduxjs/toolkit';
 
 interface UserEvent {
   id: number;
@@ -7,7 +7,7 @@ interface UserEvent {
   dateEnd: string;
 }
 
-interface UserEventsState {
+export interface UserEventsState {
   byIds: Record<UserEvent['id'], UserEvent>;
   allIds: UserEvent['id'][];
 }
@@ -17,14 +17,13 @@ const initialState: UserEventsState = {
   allIds: []
 };
 
-const userEventsReducer = (
-  state: UserEventsState = initialState,
-  action: AnyAction
-) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+const userEventsReducer = createReducer(initialState, builder => {
+  // Here you can handle different actions
+  // For example:
+  // builder.addCase(yourAction, (state, action) => {
+  //   // Mutate the state directly, it's safe within createReducer
+  // });
+  // If you have no cases yet, you can leave it empty
+});
 
 export default userEventsReducer;

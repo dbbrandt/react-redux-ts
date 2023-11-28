@@ -1,4 +1,4 @@
-import { createReducer } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserEvent {
   id: number;
@@ -17,13 +17,22 @@ const initialState: UserEventsState = {
   allIds: []
 };
 
-const userEventsReducer = createReducer(initialState, builder => {
-  // Here you can handle different actions
-  // For example:
-  // builder.addCase(yourAction, (state, action) => {
-  //   // Mutate the state directly, it's safe within createReducer
-  // });
-  // If you have no cases yet, you can leave it empty
+const userEventsSlice = createSlice({
+  name: 'userEvents',
+  initialState,
+  reducers: {
+    // Define your reducers here. Each key in this object will be an action creator.
+    // For example:
+    addUserEvent(state, action: PayloadAction<UserEvent>) {
+      const event = action.payload;
+      state.byIds[event.id] = event;
+      state.allIds.push(event.id);
+    }
+    // You can add as many reducers as you need.
+  }
 });
 
-export default userEventsReducer;
+// Export the action creators
+export const { addUserEvent/* export your action creators here, e.g., addUserEvent */ } = userEventsSlice.actions;
+
+export default userEventsSlice.reducer;

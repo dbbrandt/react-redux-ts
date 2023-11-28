@@ -1,5 +1,6 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit';
 import userEventsReducer from './user-events';
+import recorderSlice from "../components/Recorder/recorder-slice";
 
 let middleware: Middleware[] = [];
 
@@ -10,7 +11,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const store = configureStore({
   reducer: {
-    userEvents: userEventsReducer
+    userEvents: userEventsReducer,
+    recorderEvents: recorderSlice
   },
   middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(middleware),

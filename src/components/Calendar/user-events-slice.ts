@@ -19,7 +19,7 @@ export const loadEvents = createAsyncThunk(
 
 export const createEvent = createAsyncThunk(
     'userEvents/createEvent',
-    async (event : UserEvent, { rejectWithValue}) => {
+    async (event : InitialEvent, { rejectWithValue}) => {
       try {
         const response = await fetch(`http://localhost:3001/events`, {
           method: 'POST',
@@ -46,12 +46,14 @@ export interface UserEvent {
   dateEnd: string;
 }
 
-export const initialEvent : UserEvent = {
-  id: 0,
+export interface InitialEvent extends Omit<UserEvent, "id"> {}
+
+export const initialEvent : Omit<InitialEvent,"id"> = {
   title: "",
   dateStart: "",
   dateEnd: ""
 };
+
 
 export interface UserEventsState {
   byIds: Record<UserEvent['id'], UserEvent>;

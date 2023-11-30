@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import {startRecording, stopRecording} from './recorder-slice';
 import {RootState, useAppDispatch} from "../../redux/store";
 import { addZero } from "../../lib/utils";
-import {createEvent, initialEvent, UserEvent} from "../Calendar/user-events-slice";
+import {createEvent, InitialEvent, initialEvent} from "../Calendar/user-events-slice";
 
 const Recorder = () => {
     const dispatch = useAppDispatch();
@@ -13,7 +13,7 @@ const Recorder = () => {
     const started = dateStart !== '';
     const interval = useRef<number>(0);
     const [, setCount] = useState<number>(0);
-    const [event, setEvent] = useState<UserEvent>(initialEvent);
+    const [event, setEvent] = useState<InitialEvent>(initialEvent);
 
     const handleClick = () => {
         if (started) {

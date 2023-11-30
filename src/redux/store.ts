@@ -1,8 +1,9 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit';
-import userEventsReducer from './user-events';
+import { useDispatch } from 'react-redux';
+import userEventsReducer from '../components/Calendar/user-events-slice';
 import recorderSlice from "../components/Recorder/recorder-slice";
 
-let middleware: Middleware[] = [];
+const middleware: Middleware[] = [];
 
 if (process.env.NODE_ENV === 'development') {
   const { logger } = require('redux-logger');
@@ -18,6 +19,9 @@ const store = configureStore({
       getDefaultMiddleware().concat(middleware),
 
 });
+
+export type AppDispatch = typeof store.dispatch
+export const useAppDispatch: () => AppDispatch = useDispatch // Export a hook that can be reused to resolve types
 
 // Type for the RootState based on the rootReducer
 export type RootState = ReturnType<typeof store.getState>;

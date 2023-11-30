@@ -4,8 +4,7 @@ import cx from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import {startRecording, stopRecording} from './recorder-slice';
 import {RootState} from "../../redux/store";
-
-const addZero = (num: number) => (num < 10 ? `0${num}` : `${num}`);
+import { addZero } from "../../lib/utils";
 
 const Recorder = () => {
     const dispatch = useDispatch();

@@ -1,28 +1,44 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {useRef, useState, useEffect, ChangeEvent} from 'react';
 import './Recorder.css';
 import cx from 'classnames';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {startRecording, stopRecording} from './recorder-slice';
-import {RootState} from "../../redux/store";
+import {RootState, useAppDispatch} from "../../redux/store";
 import { addZero } from "../../lib/utils";
+import {createEvent, initialEvent, UserEvent} from "../Calendar/user-events-slice";
 
 const Recorder = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const dateStart = useSelector((state: RootState) => state.recorderEvents.dateStart);
     const started = dateStart !== '';
     const interval = useRef<number>(0);
     const [, setCount] = useState<number>(0);
+    const [event, setEvent] = useState<UserEvent>(initialEvent);
 
     const handleClick = () => {
         if (started) {
             window.clearInterval(interval.current);
             dispatch(stopRecording());
+            event.dateEnd = new Date().toISOString();
+            dispatch(createEvent(event));
+            setEvent(initialEvent);
         } else {
-            dispatch(startRecording());
-            interval.current = window.setInterval(() => {
-                setCount(count => count + 1);
-            }, 1000);
+            if (event.title === "") alert("Please enter a title first.");
+            else {
+                dispatch(startRecording());
+                event.dateStart = new Date().toISOString();
+                interval.current = window.setInterval(() => {
+                    setCount(count => count + 1);
+                }, 1000);
+            }
         }
+    };
+
+    const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setEvent(prev => ({
+            ...prev,  // Spread the previous state
+            title: event.target.value  // Update the title property
+        }));
     };
 
     useEffect(() => {
@@ -47,6 +63,15 @@ const Recorder = () => {
             <div className="recorder-counter">
                 {addZero(hours)}:{addZero(minutes)}:{addZero(seconds)}
             </div>
+            <div>
+                <input
+                    type="text"
+                    value={event.title}
+                    onChange={handleTitleChange}
+                    placeholder="Enter a title"
+                />
+            </div>
+
         </div>
     );
 };

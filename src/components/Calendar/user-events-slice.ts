@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction, SerializedError} from '@reduxjs/toolkit';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const loadEvents = createAsyncThunk(
@@ -17,6 +17,28 @@ export const loadEvents = createAsyncThunk(
     }
 );
 
+export const createEvent = createAsyncThunk(
+    'userEvents/createEvent',
+    async (event : UserEvent, { rejectWithValue}) => {
+      try {
+        const response = await fetch(`http://localhost:3001/events`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(event)
+        });
+        if (!response.ok) {
+          return rejectWithValue('Network response was not ok');
+        }
+        const createdEvent: UserEvent = await response.json();
+        return createdEvent;
+      } catch (error) {
+        return rejectWithValue('Failed to create event');
+      }
+    }
+)
+
 export interface UserEvent {
   id: number;
   title: string;
@@ -24,11 +46,18 @@ export interface UserEvent {
   dateEnd: string;
 }
 
+export const initialEvent : UserEvent = {
+  id: 0,
+  title: "",
+  dateStart: "",
+  dateEnd: ""
+};
+
 export interface UserEventsState {
   byIds: Record<UserEvent['id'], UserEvent>;
   allIds: UserEvent['id'][];
   loading: boolean;
-  error: string | null;
+  error: string | null | SerializedError;
 }
 
 const initialState: UserEventsState = {
@@ -38,17 +67,25 @@ const initialState: UserEventsState = {
   error: null
 };
 
+const setError = (
+    state: UserEventsState,
+    action: PayloadAction<unknown, string, unknown, SerializedError>
+) => {
+  state.loading = false;
+  state.error = action.error?.message ?? 'An unknown error occurred';
+};
+
 const userEventsSlice = createSlice({
   name: 'userEvents',
   initialState,
   reducers: {
     // Define your reducers here. Each key in this object will be an action creator.
     // For example:
-    addUserEvent(state, action: PayloadAction<UserEvent>) {
-      const event = action.payload;
-      state.byIds[event.id] = event;
-      state.allIds.push(event.id);
-    }
+    // addUserEvent(state, action: PayloadAction<UserEvent>) {
+    //   const event = action.payload;
+    //   state.byIds[event.id] = event;
+    //   state.allIds.push(event.id);
+    // }
     // You can add as many reducers as you need.
   },
   extraReducers: (builder) => {
@@ -66,14 +103,17 @@ const userEventsSlice = createSlice({
           });
           state.loading = false;
         })
-        .addCase(loadEvents.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload as string;
-        });
+        .addCase(createEvent.fulfilled, (state,  action) => {
+          const event = action.payload;
+          state.byIds[event.id] = event;
+          state.allIds.push(event.id);
+        })
+        .addCase(loadEvents.rejected, setError)
+        .addCase(createEvent.rejected, setError);
   }
 });
 
 // Export the action creators
-export const { addUserEvent/* export your action creators here, e.g., addUserEvent */ } = userEventsSlice.actions;
+// export const { addUserEvent } = userEventsSlice.actions;
 
 export default userEventsSlice.reducer;

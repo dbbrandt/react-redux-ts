@@ -7,12 +7,14 @@ export const loadEvents = createAsyncThunk(
       try {
         const response = await fetch('http://localhost:3001/events');
         if (!response.ok) {
+          console.log(`Network response was not ok: ${response}`);
           return rejectWithValue('Network response was not ok');
         }
         const events : UserEvent[] = await response.json();
         return events;
       } catch (error) {
-        return rejectWithValue('Failed to load events');
+          console.log(`Exception: ${error}`);
+          return rejectWithValue('Failed to load events');
       }
     }
 );
@@ -56,6 +58,28 @@ export const deleteEvent = createAsyncThunk(
       } catch (error) {
         return rejectWithValue('Failed to delete event');
       }
+    }
+)
+
+export const updateEvent = createAsyncThunk(
+    'userEvents/updateEvent',
+    async (event: UserEvent, { rejectWithValue}) => {
+        try {
+            const response = await fetch(`http://localhost:3001/events/${event.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(event)
+            });
+            if (!response.ok) {
+                return rejectWithValue('Network response was not ok');
+            }
+            const updatedEvent: UserEvent = await response.json();
+            return updatedEvent;
+        } catch (error) {
+            return rejectWithValue('Failed to update event');
+        }
     }
 )
 
@@ -135,9 +159,14 @@ const userEventsSlice = createSlice({
           delete state.byIds[id];
           delete state.allIds[id];
         })
+        .addCase(updateEvent.fulfilled, (state,  action) => {
+            const event = action.payload;
+            state.byIds[event.id] = event;
+        })
         .addCase(loadEvents.rejected, setError)
         .addCase(createEvent.rejected, setError)
-        .addCase(deleteEvent.rejected, setError);
+        .addCase(deleteEvent.rejected, setError)
+        .addCase(updateEvent.rejected, setError);
   }
 });
 

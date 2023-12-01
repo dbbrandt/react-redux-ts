@@ -1,9 +1,10 @@
 import './Calendar.css';
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {deleteEvent, loadEvents, UserEvent} from "./user-events-slice";
+import {loadEvents, UserEvent} from "./user-events-slice";
 import {RootState, useAppDispatch} from "../../redux/store";
 import { addZero } from '../../lib/utils';
+import EventItem from "./EventItem";
 
 
 const createDateKey = (date: Date) => {
@@ -39,13 +40,9 @@ const groupEventsByDay = (events: UserEvent[]) => {
 };
 
 const Calendar: React.FC = () => {
-  const dispatch = useAppDispatch();
   const eventsData = useSelector((state: RootState) => state.userEvents.byIds);
   const events = Object.values(eventsData);
-  const handleDelete = (id: number) => {
-    console.log(`Delete #${id}`);
-    dispatch(deleteEvent(id));
-  }
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(loadEvents());
@@ -80,15 +77,7 @@ const Calendar: React.FC = () => {
                 <div className="calendar-events">
                   {events.map(event => {
                     return (
-                        <div className="calendar-event" key={event.id}>
-                          <div className="calendar-event-info">
-                            <div className="calendar-event-time">10:00 - 12:00</div>
-                            <div className="calendar-event-title">{event.title}</div>
-                          </div>
-                          <button className="calendar-event-delete-button" onClick={() => handleDelete(event.id)}>
-                            &times;
-                          </button>
-                        </div>
+                        <EventItem key={`eventId-${event.id}`} eventItem={event}/>
                     );
                   })}
                 </div>

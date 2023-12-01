@@ -41,7 +41,7 @@ export const createEvent = createAsyncThunk(
 
 export const deleteEvent = createAsyncThunk(
     'userEvents/deleteEvent',
-    async (id : number, { rejectWithValue}) => {
+    async (id : UserEvent['id'], { rejectWithValue}) => {
       try {
         const response = await fetch(`http://localhost:3001/events/${id}`, {
           method: 'DELETE',

@@ -53,7 +53,7 @@ const Calendar: React.FC = () => {
   if (events.length) {
     groupedEvents = groupEventsByDay(events);
     sortedGroupKeys = Object.keys(groupedEvents).sort(
-        (date1, date2) => +new Date(date1) - +new Date(date2)
+        (date1, date2) => +new Date(date2) - +new Date(date1)
     );
   }
 
@@ -64,12 +64,13 @@ const Calendar: React.FC = () => {
           const groupDate = new Date(dayKey);
           const day = groupDate.getDate();
           const month = groupDate.toLocaleString(undefined, { month: 'long' });
+          const year = groupDate.toLocaleString(undefined, { year: 'numeric' });
 
           return (
-              <div className="calendar-day" key={`${day}-${month}`}>
+              <div className="calendar-day" key={`${day}-${month}-${year}`}>
                 <div className="calendar-day-label">
               <span>
-                {day} {month}
+                {day} {month} {year}
               </span>
                 </div>
                 <div className="calendar-events">

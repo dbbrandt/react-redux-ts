@@ -1,7 +1,7 @@
 import './Calendar.css';
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {loadEvents, UserEvent} from "./user-events-slice";
+import {deleteEvent, loadEvents, UserEvent} from "./user-events-slice";
 import {RootState, useAppDispatch} from "../../redux/store";
 import { addZero } from '../../lib/utils';
 
@@ -42,6 +42,10 @@ const Calendar: React.FC = () => {
   const dispatch = useAppDispatch();
   const eventsData = useSelector((state: RootState) => state.userEvents.byIds);
   const events = Object.values(eventsData);
+  const handleDelete = (id: number) => {
+    console.log(`Delete #${id}`);
+    dispatch(deleteEvent(id));
+  }
 
   useEffect(() => {
     dispatch(loadEvents());
@@ -81,7 +85,7 @@ const Calendar: React.FC = () => {
                             <div className="calendar-event-time">10:00 - 12:00</div>
                             <div className="calendar-event-title">{event.title}</div>
                           </div>
-                          <button className="calendar-event-delete-button">
+                          <button className="calendar-event-delete-button" onClick={() => handleDelete(event.id)}>
                             &times;
                           </button>
                         </div>

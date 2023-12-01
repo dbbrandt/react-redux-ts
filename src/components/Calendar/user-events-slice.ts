@@ -39,6 +39,26 @@ export const createEvent = createAsyncThunk(
     }
 )
 
+export const deleteEvent = createAsyncThunk(
+    'userEvents/deleteEvent',
+    async (id : number, { rejectWithValue}) => {
+      try {
+        const response = await fetch(`http://localhost:3001/events/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        if (!response.ok) {
+          return rejectWithValue('Network response was not ok');
+        }
+        return id;
+      } catch (error) {
+        return rejectWithValue('Failed to delete event');
+      }
+    }
+)
+
 export interface UserEvent {
   id: number;
   title: string;
@@ -110,8 +130,14 @@ const userEventsSlice = createSlice({
           state.byIds[event.id] = event;
           state.allIds.push(event.id);
         })
+        .addCase(deleteEvent.fulfilled, (state,  action) => {
+          const id  = action.payload;
+          delete state.byIds[id];
+          delete state.allIds[id];
+        })
         .addCase(loadEvents.rejected, setError)
-        .addCase(createEvent.rejected, setError);
+        .addCase(createEvent.rejected, setError)
+        .addCase(deleteEvent.rejected, setError);
   }
 });
 

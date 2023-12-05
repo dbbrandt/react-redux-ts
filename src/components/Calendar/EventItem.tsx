@@ -29,9 +29,7 @@ const EventItem : React.FC<Props> = ({ eventItem}) => {
     }, [editing]);
 
     const handleUpdate = () => {
-        const updated = {...eventItem};
-        updated.title = title;
-        dispatch(updateEvent(updated));
+        if (title !== eventItem.title) dispatch(updateEvent({...eventItem, title: title}));
         setEditing(false);
     }
 
